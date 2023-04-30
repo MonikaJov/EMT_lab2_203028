@@ -1,0 +1,91 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">LIBRARY</h1>
+            <h3 class="jumbotron-heading">All books</h3>
+        </div>
+    </section>
+    <div class="container mb-4">
+        <div class="row">
+            <div class="col-12" th:if="${products.size() > 0}">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Book name</th>
+                            <th scope="col">Authors</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Available copies</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="product : ${products}" class="product">
+                            <td th:text="${product.getName()}"></td>
+<!--                            <td th:text="${product.getPrice()}"></td>-->
+                            <td th:text="${product.getAuthor() != null}
+                            ? ${product.getAuthor().getName()} : 'No Manufacturer'"></td>
+                            <td th:text="${product.getCategory() != null}
+                            ? ${product.getCategory()} : 'No Category'"></td>
+
+                            <td th:text="${product.getAvailableCopies()}"></td>
+
+                            <td class="text-right">
+                                <p th:text="${product.getAvailableCopies()}==0 ? 'Rented out' : '' "></p>
+
+                                <th:block sec:authorize="hasRole('ROLE_LIBRARIAN')">
+                                    <form  method="get" th:action="@{/products/mark-as-rented-out/{id}(id=${product.getId()})}">
+                                        <button type="submit" class="btn btn-sm btn-info edit-product"
+                                                th:if="${product.getAvailableCopies() != 0}"
+                                                th:disabled="${product.getAvailableCopies() == 0}" >
+                                            Mark As Rented Out
+                                        </button>
+                                    </form>
+
+                                </th:block>
+
+
+                                <th:block sec:authorize="hasRole('ROLE_LIBRARIAN')">
+                                    <form th:action="@{'/products/delete/{id}' (id=${product.getId()})}"
+                                          th:method="DELETE">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger delete-product">
+                                            <i class="fa fa-trash">Delete</i>
+                                        </button>
+                                    </form>
+                                </th:block>
+                                <th:block sec:authorize="hasRole('ROLE_LIBRARIAN')">
+                                    <a th:href="@{'/products/edit-form/{id}' (id=${product.getId()})}"
+                                       class="btn btn-sm btn-info edit-product">
+                                        <i class="fa fa-trash">Edit</i>
+                                    </a>
+                                </th:block>
+
+                                <th:block sec:authorize="hasRole('ROLE_USER')">
+
+                                    <form  method="get" th:action="@{/products/rent/{id}(id=${product.getId()})}">
+                                    <button type="submit" class="btn btn-primary"
+                                            th:if="${product.getAvailableCopies() != 0}"
+                                            th:disabled="${product.getAvailableCopies() == 0}" >
+                                        Rent
+                                    </button>
+                                    </form>
+                                </th:block>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col mb-3">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12" sec:authorize="hasRole('ROLE_LIBRARIAN')">
+                        <a href="/products/add-form" class="btn btn-block btn-dark add-product-btn">
+                            Add new book
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
